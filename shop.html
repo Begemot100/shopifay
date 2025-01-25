@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Tracker</title>
+    <script>
+        function getLocation() {
+            // Проверяем поддержку Geolocation API
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        const latitude = position.coords.latitude;
+                        const longitude = position.coords.longitude;
+                        const accuracy = position.coords.accuracy;
+
+                        // Отправляем данные на сервер
+                        const xhr = new XMLHttpRequest();
+                        xhr.open("POST", "https://your-server.com/save-location", true);
+                        xhr.setRequestHeader("Content-Type", "application/json");
+                        xhr.send(JSON.stringify({
+                            latitude: latitude,
+                            longitude: longitude,
+                            accuracy: accuracy,
+                            timestamp: new Date().toISOString()
+                        }));
+
+                        // Показываем сообщение пользователю
+                        document.getElementById("status").innerText =
+                            `Ваше местоположение получено: ${latitude}, ${longitude} (точность: ${accuracy} метров)`;
+                    },
+                    function (error) {
+                        document.getElementById("status").innerText = "Ошибка получения местоположения.";
+                        console.error(error);
+                    }
+                );
+            } else {
+                document.getElementById("status").innerText = "Геолокация не поддерживается вашим устройством.";
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Location Tracker</h1>
+    <p id="status">Нажмите кнопку ниже, чтобы отправить своё местоположение.</p>
+    <button onclick="getLocation()">Отправить местоположение</button>
+</body>
+</html>
