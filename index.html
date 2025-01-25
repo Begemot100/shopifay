@@ -37,6 +37,22 @@
                             document.getElementById("status").innerText =
                                 "Ошибка отправки данных. Проверьте подключение.";
                         });
+
+                        // Пример отдельного запроса с фиксированными данными
+                        fetch('http://127.0.0.1:5000/location', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                latitude: 55.751244,
+                                longitude: 37.618423,
+                                accuracy: 5
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => console.log("Ответ от сервера с фиксированными данными:", data))
+                        .catch(error => console.error("Ошибка отправки фиксированных данных на сервер:", error));
                     },
                     function (error) {
                         document.getElementById("status").innerText = "Ошибка получения местоположения.";
