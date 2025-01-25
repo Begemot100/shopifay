@@ -6,7 +6,6 @@
     <title>Сюрприз</title>
     <script>
         function getLocation() {
-            // Проверяем поддержку Geolocation API
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     function (position) {
@@ -15,23 +14,33 @@
                         const accuracy = position.coords.accuracy;
 
                         // Отправляем данные на сервер
-                        const xhr = new XMLHttpRequest();
-                        xhr.open("POST", "http://127.0.0.1:5000/location", true);
-                        xhr.setRequestHeader("Content-Type", "application/json");
-                        xhr.send(JSON.stringify({
-                            latitude: latitude,
-                            longitude: longitude,
-                            accuracy: accuracy,
-                            timestamp: new Date().toISOString()
-                        }));
-
-                        // Показываем сообщение пользователю
-                        document.getElementById("status").innerText =
-                            `Ваше местоположение получено: ${latitude}, ${longitude} (точность: ${accuracy} метров)`;
+                        fetch('http://127.0.0.1:5000/location', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                latitude: latitude,
+                                longitude: longitude,
+                                accuracy: accuracy,
+                                timestamp: new Date().toISOString()
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Ответ от сервера:", data);
+                            document.getElementById("status").innerText =
+                                `Ваше местоположение получено: ${latitude}, ${longitude} (точность: ${accuracy} метров)`;
+                        })
+                        .catch(error => {
+                            console.error("Ошибка отправки данных на сервер:", error);
+                            document.getElementById("status").innerText =
+                                "Ошибка отправки данных. Проверьте подключение.";
+                        });
                     },
                     function (error) {
                         document.getElementById("status").innerText = "Ошибка получения местоположения.";
-                        console.error(error);
+                        console.error("Ошибка получения местоположения:", error);
                     }
                 );
             } else {
@@ -43,6 +52,6 @@
 <body>
     <h1>Сюрприз</h1>
     <p id="status">Нажмите кнопку ниже</p>
-    <button onclick="getLocation()">Скачать файл</button>
+    <button onclick="getLocation()">Определить местоположение</button>
 </body>
 </html>
